@@ -1,0 +1,18 @@
+# Ignore Node.js module folders
+node_modules/
+*/node_modules/
+
+# Ignore .env files (which contain secrets)
+.env
+*/.env
+
+# Ignore React production build folder
+client/build/
+
+# Ignore log files
+npm-debug.log
+*.log
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
