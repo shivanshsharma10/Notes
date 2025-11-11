@@ -102,6 +102,7 @@ function App() {
       
       {/* --- SIDEBAR (Left) --- */}
       <div className="sidebar">
+        <h1 className="app-title">LovesNotes</h1>
         <button className="new-note-btn" onClick={handleNewNoteClick}>
           + New Note
         </button>
