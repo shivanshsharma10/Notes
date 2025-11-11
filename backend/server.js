@@ -80,7 +80,8 @@ app.post('/api/generate-note', async (req, res) => {
     const { prompt } = req.body;
 
     // Get the generative model
-    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+    // --- THIS IS THE NEW, CORRECT LINE ---
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
     // Generate the content
     const result = await model.generateContent(prompt);
