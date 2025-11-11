@@ -1,0 +1,189 @@
+/* --- 1. THEME DEFINITIONS (CSS Variables) --- */
+:root {
+  --bg-color: #f0f2f5;
+  --sidebar-bg: #ffffff;
+  --main-content-bg: #f0f2f5;
+  --text-color: #111111;
+  --text-color-light: #555;
+  --border-color: #dcdcdc;
+  --input-bg: #ffffff;
+  --input-border: #ccc;
+  --hover-bg: #f4f4f4;
+  --btn-primary-bg: #4d94ff;
+  --btn-primary-hover: #357ABD;
+}
+
+/* When the .app-container has the 'dark' class, override these variables */
+.app-container.dark {
+  --bg-color: #1a1a1a;
+  --sidebar-bg: #242424;
+  --main-content-bg: #1a1a1a;
+  --text-color: #e0e0e0;
+  --text-color-light: #aaa;
+  --border-color: #333333;
+  --input-bg: #2c2c2c;
+  --input-border: #444;
+  --hover-bg: #333333;
+  --btn-primary-bg: #4d94ff;
+  --btn-primary-hover: #357ABD;
+}
+
+/* --- 2. GENERAL STYLES (using variables) --- */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* --- 3. SIDEBAR STYLES --- */
+.sidebar {
+  width: 280px;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.new-note-btn {
+  padding: 12px 15px;
+  background-color: var(--btn-primary-bg);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  margin-bottom: 20px;
+  transition: background-color 0.2s;
+}
+
+.new-note-btn:hover {
+  background-color: var(--btn-primary-hover);
+}
+
+.sidebar-heading {
+  font-size: 14px;
+  color: var(--text-color-light);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-left: 10px;
+}
+
+.notes-list {
+  list-style-type: none;
+  overflow-y: auto;
+}
+
+.note-list-item {
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  transition: background-color 0.2s;
+}
+
+.note-list-item:hover {
+  background-color: var(--hover-bg);
+}
+
+/* --- 4. MAIN CONTENT STYLES --- */
+.main-content {
+  flex-grow: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* Needed for absolute positioning of the toggle */
+  background-color: var(--main-content-bg);
+  transition: background-color 0.2s;
+}
+
+/* --- 5. NEW THEME TOGGLE BUTTON --- */
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background-color: var(--hover-bg);
+  font-weight: bold;
+  user-select: none; /* Prevents text selection on click */
+  transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+  background-color: var(--border-color);
+}
+
+/* --- 6. FORM STYLES --- */
+.main-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.main-form input[type="text"],
+.main-form textarea {
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.main-form input[type="text"] {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.main-form textarea {
+  flex-grow: 1;
+  resize: none;
+}
+
+.action-buttons {
+  margin-top: 20px;
+}
+
+.save-btn {
+  padding: 10px 20px;
+  background-color: #4CAF50; /* Green */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.delete-btn {
+  padding: 10px 20px;
+  background-color: #ff4d4d; /* Red */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+}

@@ -1,173 +1,160 @@
-import React, {useEffect, useState} from "react";
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './App.css'; // Make sure this is imported
 
-const API_URL = 'https://my-note-api-chd3.onrender.com/api/notes'
+// This is a blank note to use for a new note
+const BLANK_NOTE = { title: '', content: '' };
 
-function App(){
-const [notes, setNotes] = useState([]);
+function App() {
+  const API_URL = 'https://my-note-api-chd3.onrender.com/api/notes';
 
-const [newNote, setNewNote] = useState({title: '', content: ''})
+  // --- STATE ---
+  const [notes, setNotes] = useState([]); 
+  const [activeNote, setActiveNote] = useState(BLANK_NOTE);
 
-const [editingNote, setEditingNote] = useState(null);
+  // --- NEW THEME STATE ---
+  // We get the saved theme from localStorage, or default to 'light'
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
-useEffect(()=>{
-  const fetchNotes = async () =>{
-    try{
-      const response = await axios.get(API_URL)
-      setNotes(response.data)
-    } catch(error){
-      console.error('Error fetching notes :', error)
-    }
-  }
-
-  fetchNotes();
-},[])
-
-const handleSubmit = async (e) => { // <-- MODIFIED
-    e.preventDefault(); 
-    
-    if (editingNote) {
-      // If we are editing, call the update function
-      await handleUpdateNote(); // <-- MODIFIED
-    } else {
-      // Otherwise, call the create function (original logic)
+  // --- 1. FETCH ALL NOTES ---
+  useEffect(() => {
+    const fetchNotes = async () => {
       try {
-        const response = await axios.post(API_URL, newNote);
-        setNotes([...notes, response.data]);
-        setNewNote({ title: '', content: '' });
+        const response = await axios.get(API_URL);
+        setNotes(response.data);
+      } catch (error) {
+        console.error('Error fetching notes:', error);
+      }
+    };
+    fetchNotes();
+  }, []);
+
+  // --- NEW THEME TOGGLE FUNCTION ---
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    // Save the user's preference to localStorage
+    localStorage.setItem('theme', newTheme);
+  };
+
+  // --- 2. SIDEBAR CLICK HANDLERS ---
+  const handleNewNoteClick = () => {
+    setActiveNote(BLANK_NOTE);
+  };
+
+  const handleSelectNote = (note) => {
+    setActiveNote(note);
+  };
+
+  // --- 3. MAIN CONTENT FORM HANDLERS ---
+  const handleNoteChange = (e) => {
+    const { name, value } = e.target;
+    setActiveNote(prevNote => ({
+      ...prevNote,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveNote = async () => {
+    if (activeNote._id) {
+      // --- UPDATE (PUT) ---
+      try {
+        const response = await axios.put(`${API_URL}/${activeNote._id}`, {
+          title: activeNote.title,
+          content: activeNote.content,
+        });
+        setNotes(prevNotes => 
+          prevNotes.map(note => (note._id === activeNote._id ? response.data : note))
+        );
+      } catch (error) {
+        console.error('Error updating note:', error);
+      }
+    } else {
+      // --- CREATE (POST) ---
+      try {
+        const response = await axios.post(API_URL, {
+          title: activeNote.title,
+          content: activeNote.content,
+        });
+        setNotes(prevNotes => [...prevNotes, response.data]);
+        setActiveNote(response.data);
       } catch (error) {
         console.error('Error creating note:', error);
       }
     }
   };
 
-const handleDeleteNote = async (id) =>{
-  try{
-    await axios.delete(`${API_URL}/${id}`)
-    const updatedNotes = notes.filter(note => note._id !== id);
-    setNotes(updatedNotes);
-  } catch(error){
-    console.error('error deleting the note:' , error)
-  }
-}
-
-// --- 2. NEW FUNCTION ---
-  // This function will load a note's data into the form for editing
-  const handleEditClick = (note) => { // <-- NEW
-    setEditingNote(note); // Set the note we're editing
-    setNewNote({ title: note.title, content: note.content }); // Load its data into the form
-  };
-
-  // --- 3. NEW FUNCTION ---
-  // This function will handle the "Cancel" button click
-  const handleCancelEdit = () => { // <-- NEW
-    setEditingNote(null); // Clear the editing state
-    setNewNote({ title: '', content: '' }); // Clear the form
-  };
-
-  // --- 4. NEW FUNCTION ---
-  // This function handles the actual API call for updating a note
-  const handleUpdateNote = async () => { // <-- NEW
+  const handleDeleteNote = async () => {
+    if (!activeNote._id) return;
     try {
-      const response = await axios.put(`${API_URL}/${editingNote._id}`, newNote);
-      // Update the notes list in state by replacing the old note with the new one
-      const updatedNotes = notes.map(note =>
-        note._id === editingNote._id ? response.data : note
-      );
-      setNotes(updatedNotes);
-      
-      // Reset the form and editing state
-      handleCancelEdit();
+      await axios.delete(`${API_URL}/${activeNote._id}`);
+      setNotes(prevNotes => prevNotes.filter(note => note._id !== activeNote._id));
+      setActiveNote(BLANK_NOTE);
     } catch (error) {
-      console.error('Error updating note:', error);
+      console.error('Error deleting note:', error);
     }
   };
 
-
-const handleInputChange = (e)=>{
-  const {name, value} = e.target;
-  setNewNote({...newNote, [name]:value})
-}
-
-return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1>My Notes App</h1>
-
-      {/* --- Form now calls handleSubmit --- */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}>
-        
-        {/* --- Title changes based on editing state --- */}
-        <h3>{editingNote ? 'Edit Note' : 'Add a New Note'}</h3> {/* <-- MODIFIED */}
-        
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={newNote.title}
-          onChange={handleInputChange}
-          required
-          style={{ display: 'block', width: '300px', marginBottom: '10px', padding: '5px' }}
-        />
-        <textarea
-          name="content"
-          placeholder="Content"
-          value={newNote.content}
-          onChange={handleInputChange}
-          required
-          style={{ display: 'block', width: '300px', height: '100px', marginBottom: '10px', padding: '5px' }}
-        />
-        
-        {/* --- Button text changes --- */}
-        <button type="submit" style={{ padding: '5px 10px' }}>
-          {editingNote ? 'Update Note' : 'Save Note'} {/* <-- MODIFIED */}
+  // --- 4. RENDER THE APP ---
+  // --- We add the current 'theme' as a class to the main container ---
+  return (
+    <div className={`app-container ${theme}`}>
+      
+      {/* --- SIDEBAR (Left) --- */}
+      <div className="sidebar">
+        <button className="new-note-btn" onClick={handleNewNoteClick}>
+          + New Note
         </button>
-        
-        {/* --- New "Cancel" button --- */}
-        {editingNote && ( // <-- NEW
-          <button 
-            type="button" 
-            onClick={handleCancelEdit} 
-            style={{ marginLeft: '10px', padding: '5px 10px' }}
-          >
-            Cancel
-          </button>
-        )}
-      </form>
+        <h2 className="sidebar-heading">Your Notes</h2>
+        <ul className="notes-list">
+          {notes.map((note) => (
+            <li
+              key={note._id}
+              className="note-list-item"
+              onClick={() => handleSelectNote(note)}
+            >
+              {note.title || 'Untitled Note'}
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      {/* --- Notes List --- */}
-      <div>
-        <h2>Your Notes</h2>
-        {notes.length === 0 ? (
-          <p>No notes found. Add one!</p>
-        ) : (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-            {notes.map((note) => (
-              <div key={note._id} style={{ border: '1.5px solid black', borderRadius: '5px', padding: '15px', width: '250px' }}>
-                <h3 style={{ marginTop: 0 }}>{note.title}</h3>
-                <p>{note.content}</p>
-                
-                {/* --- New "Edit" Button --- */}
-                <button // <-- NEW
-                  onClick={() => handleEditClick(note)}
-                  style={{ backgroundColor: '#4d94ff', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer', marginRight: '5px' }}
-                >
-                  Edit
-                </button>
-                
-                <button 
-                  onClick={() => handleDeleteNote(note._id)}
-                  style={{ backgroundColor: '#ff4d4d', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
+      {/* --- MAIN CONTENT (Right) --- */}
+      <div className="main-content">
+
+        {/* --- NEW THEME TOGGLE BUTTON --- */}
+        <div className="theme-toggle" onClick={toggleTheme}>
+          {theme === 'light' ? '🌙 Night' : '☀️ Day'}
+        </div>
+        
+        <form className="main-form" onSubmit={(e) => e.preventDefault()}>
+          <input
+            type="text"
+            name="title"
+            placeholder="Note Title"
+            value={activeNote.title}
+            onChange={handleNoteChange}
+          />
+          <textarea
+            name="content"
+            placeholder="Start writing your note..."
+            value={activeNote.content}
+            onChange={handleNoteChange}
+          />
+          <div className="action-buttons">
+            <button className="save-btn" onClick={handleSaveNote}>
+              Save Note
+            </button>
+            {activeNote._id && (
+              <button className="delete-btn" onClick={handleDeleteNote}>
+                Delete
+              </button>
+            )}
           </div>
-        )}
+        </form>
       </div>
     </div>
   );
 }
-
 
 export default App;
