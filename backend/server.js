@@ -1,5 +1,6 @@
 const express = require("express")
 const mongoose = require('mongoose')
+const { GoogleGenerativeAI } = require("@google/generative-ai")
 // const { connectToServer } = require('./db');
 const cors = require("cors")
 const app = express()
@@ -7,7 +8,7 @@ const PORT = process.env.port || 5000
 
 app.use(cors());
 app.use(express.json());
-
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const MONGO_URI = "mongodb+srv://sshivansh:XC2G4R1Zdw9N77pS@cluster0.x6gbslr.mongodb.net/?appName=Cluster0";
 
 mongoose.connect(MONGO_URI)
@@ -69,6 +70,29 @@ app.delete("/api/notes/:id" , async (req , res)=>{
     res.status(200).json({message :"Note deleted successfully"})
   } catch(error){
     res.status(500).json({message: error.message});
+  }
+});
+
+// --- NEW GEMINI API ROUTE ---
+app.post('/api/generate-note', async (req, res) => {
+  try {
+    // Get the prompt from the user's request
+    const { prompt } = req.body;
+
+    // Get the generative model
+    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+
+    // Generate the content
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    // Send the generated text back to the front-end
+    res.status(200).json({ generatedText: text });
+
+  } catch (error) {
+    console.error("Error with Gemini API:", error);
+    res.status(500).json({ message: "Failed to generate note" });
   }
 });
 
