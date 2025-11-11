@@ -84,9 +84,13 @@ body {
   padding-left: 10px;
 }
 
+/* --- WITH THIS --- */
 .notes-list {
   list-style-type: none;
-  overflow-y: auto;
+  flex-grow: 1; /* This is the magic: makes the list fill available space */
+  overflow-y: auto; /* Adds scrollbar ONLY to the list if it's too long */
+  min-height: 100px; /* Ensures it's always at least a little visible */
+  margin-bottom: 15px;
 }
 
 .note-list-item {
@@ -193,4 +197,84 @@ body {
   display: flex;
   justify-content: flex-end; /* Pushes toggle to the right */
   margin-bottom: 20px; /* Space between toggle and form */
+}
+
+/* --- 7. NEW GEMINI SECTION STYLES --- */
+
+.gemini-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 15px;
+  /* This section will sit at the bottom of the sidebar */
+}
+
+.gemini-prompt {
+  width: 100%;
+  height: 80px;
+  resize: none;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-radius: 8px;
+  padding: 10px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.gemini-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #1a73e8; /* Google Blue */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.gemini-btn:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.gemini-btn:hover:not(:disabled) {
+  background-color: #1558b0;
+}
+
+.generated-text-container {
+  position: relative;
+  background-color: var(--hover-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* <pre> tag preserves whitespace and line breaks from the AI */
+.generated-text-container pre {
+  white-space: pre-wrap; /* Wraps text to the next line */
+  word-wrap: break-word; /* Breaks long words */
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: var(--btn-primary-bg);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.copy-btn:hover {
+  opacity: 1;
 }

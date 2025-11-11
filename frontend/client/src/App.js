@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './App.css'; // Make sure this is imported
+import './App.css'; 
 
-// This is a blank note to use for a new note
 const BLANK_NOTE = { title: '', content: '' };
 
 function App() {
   const API_URL = 'https://my-note-api-chd3.onrender.com/api/notes';
 
-  // --- STATE ---
+  // --- EXISTING STATE ---
   const [notes, setNotes] = useState([]); 
   const [activeNote, setActiveNote] = useState(BLANK_NOTE);
-
-  // --- NEW THEME STATE ---
-  // We get the saved theme from localStorage, or default to 'light'
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  
+  // --- NEW STATE FOR GEMINI FEATURE ---
+  const [geminiPrompt, setGeminiPrompt] = useState('');
+  const [generatedText, setGeneratedText] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // --- 1. FETCH ALL NOTES ---
   useEffect(() => {
@@ -29,24 +30,23 @@ function App() {
     fetchNotes();
   }, []);
 
-  // --- NEW THEME TOGGLE FUNCTION ---
+  // --- 2. THEME TOGGLE ---
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    // Save the user's preference to localStorage
     localStorage.setItem('theme', newTheme);
   };
 
-  // --- 2. SIDEBAR CLICK HANDLERS ---
+  // --- 3. SIDEBAR CLICK HANDLERS ---
   const handleNewNoteClick = () => {
-    setActiveNote(BLANK_NOTE);
+    setActiveNote(BLANK_NOTE); 
   };
 
   const handleSelectNote = (note) => {
-    setActiveNote(note);
+    setActiveNote(note); 
   };
 
-  // --- 3. MAIN CONTENT FORM HANDLERS ---
+  // --- 4. MAIN CONTENT FORM HANDLERS ---
   const handleNoteChange = (e) => {
     const { name, value } = e.target;
     setActiveNote(prevNote => ({
@@ -85,7 +85,7 @@ function App() {
   };
 
   const handleDeleteNote = async () => {
-    if (!activeNote._id) return;
+    if (!activeNote._id) return; 
     try {
       await axios.delete(`${API_URL}/${activeNote._id}`);
       setNotes(prevNotes => prevNotes.filter(note => note._id !== activeNote._id));
@@ -95,8 +95,30 @@ function App() {
     }
   };
 
-  // --- 4. RENDER THE APP ---
-  // --- We add the current 'theme' as a class to the main container ---
+  // --- 5. NEW GEMINI FEATURE HANDLERS ---
+  
+  // This is a placeholder. It just simulates a 2-second API call.
+  const handleGenerateNote = async () => {
+    if (!geminiPrompt) return; // Don't run if prompt is empty
+
+    setIsGenerating(true);
+    setGeneratedText('');
+
+    // --- TODO: LATER WE WILL REPLACE THIS WITH THE REAL API CALL ---
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate loading
+    const simulatedResponse = `This is a generated note about: "${geminiPrompt}". We will replace this with real Gemini output later.`;
+    setGeneratedText(simulatedResponse);
+    // --- END OF SIMULATION ---
+
+    setIsGenerating(false);
+  };
+
+  const handleCopyText = () => {
+    navigator.clipboard.writeText(generatedText);
+    alert('Copied to clipboard!');
+  };
+
+  // --- 6. RENDER THE APP ---
   return (
     <div className={`app-container ${theme}`}>
       
@@ -118,14 +140,38 @@ function App() {
             </li>
           ))}
         </ul>
+        
+        {/* --- NEW GEMINI SECTION --- */}
+        <div className="gemini-section">
+          <h3 className="sidebar-heading">Generate Note</h3>
+          <textarea
+            className="gemini-prompt"
+            placeholder="Enter a prompt for Gemini..."
+            value={geminiPrompt}
+            onChange={(e) => setGeminiPrompt(e.target.value)}
+          />
+          <button className="gemini-btn" onClick={handleGenerateNote} disabled={isGenerating}>
+            {isGenerating ? 'Generating...' : 'Generate'}
+          </button>
+          
+          {/* Output area for generated text */}
+          {generatedText && (
+            <div className="generated-text-container">
+              <pre>{generatedText}</pre>
+              <button className="copy-btn" onClick={handleCopyText}>Copy</button>
+            </div>
+          )}
+        </div>
+        {/* --- END OF NEW GEMINI SECTION --- */}
+        
       </div>
 
       {/* --- MAIN CONTENT (Right) --- */}
       <div className="main-content">
-
-        {/* --- NEW THEME TOGGLE BUTTON --- */}
-        <div className="theme-toggle" onClick={toggleTheme}>
-          {theme === 'light' ? '🌙 Night' : '☀️ Day'}
+        <div className="main-content-header">
+          <div className="theme-toggle" onClick={toggleTheme}>
+            {theme === 'light' ? '🌙 Night' : '☀️ Day'}
+          </div>
         </div>
         
         <form className="main-form" onSubmit={(e) => e.preventDefault()}>
