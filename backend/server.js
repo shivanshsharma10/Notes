@@ -9,7 +9,7 @@ const PORT = process.env.port || 5000
 app.use(cors());
 app.use(express.json());
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const MONGO_URI = "mongodb+srv://sshivansh:XC2G4R1Zdw9N77pS@cluster0.x6gbslr.mongodb.net/?appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('Successfully connected to MongoDB'))
