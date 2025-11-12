@@ -8,7 +8,7 @@ const PORT = process.env.port || 5000
 
 app.use(cors());
 app.use(express.json());
-const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY);
+const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
 const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI)
