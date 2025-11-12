@@ -76,19 +76,19 @@ app.delete("/api/notes/:id" , async (req , res)=>{
 // --- NEW GEMINI API ROUTE ---
 app.post('/api/generate-note', async (req, res) => {
   try {
-    // Get the prompt from the user's request
     const { prompt } = req.body;
+// const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});    // Generate the content
+//     const result = await model.generateContent(prompt);
+//     const response = await result.response;
+//     const text = response.text();
 
-    // Get the generative model
-    // --- THIS IS THE NEW, CORRECT LINE ---
-// --- THIS IS THE NEW, CORRECT LINE ---
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});    // Generate the content
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
 
+ const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
     // Send the generated text back to the front-end
-    res.status(200).json({ generatedText: text });
+    res.status(200).json({ generatedText: response.text });
 
   } catch (error) {
     console.error("Error with Gemini API:", error);
