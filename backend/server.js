@@ -1,6 +1,6 @@
 const express = require("express")
 const mongoose = require('mongoose')
-const { GoogleGenerativeAI } = require("@google/generative-ai")
+const { GoogleGenAI } = require("@google/genai")
 // const { connectToServer } = require('./db');
 const cors = require("cors")
 const app = express()
@@ -8,7 +8,7 @@ const PORT = process.env.port || 5000
 
 app.use(cors());
 app.use(express.json());
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY);
 const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI)
