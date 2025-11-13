@@ -1,4 +1,6 @@
-mongodb+srv://sshivansh:<db_password>@cluster0.x6gbslr.mongodb.net/?appName=Cluster0
+// mongodb+srv://sshivansh:<db_password>@cluster0.x6gbslr.mongodb.net/?appName=Cluster0
 
 
-XC2G4R1Zdw9N77pS
+
+
+//  "@google/genai": "1.29.0",
