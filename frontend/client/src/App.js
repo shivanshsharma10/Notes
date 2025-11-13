@@ -6,6 +6,7 @@ const BLANK_NOTE = { title: '', content: '' };
 
 function App() {
   const API_URL = 'https://my-note-api-chd3.onrender.com/api/notes';
+  const GEMINI_API_URL = 'https://my-note-api-chd3.onrender.com/api/generate-note';
 
   // --- EXISTING STATE ---
   const [notes, setNotes] = useState([]); 
@@ -97,18 +98,27 @@ function App() {
 
   // --- 5. NEW GEMINI FEATURE HANDLERS ---
   
-  // This is a placeholder. It just simulates a 2-second API call.
+  
   const handleGenerateNote = async () => {
     if (!geminiPrompt) return; // Don't run if prompt is empty
 
     setIsGenerating(true);
     setGeneratedText('');
 
-    // --- TODO: LATER WE WILL REPLACE THIS WITH THE REAL API CALL ---
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate loading
-    const simulatedResponse = `This is a generated note about: "${geminiPrompt}". We will replace this with real Gemini output later.`;
-    setGeneratedText(simulatedResponse);
-    // --- END OF SIMULATION ---
+    try {
+      // This is the REAL API call to your backend
+      const response = await axios.post(GEMINI_API_URL, {
+        prompt: geminiPrompt 
+      });
+
+      // Set the text from Gemini's response
+      setGeneratedText(response.data.generatedText);
+
+    } catch (error) {
+      console.error('Error generating note:', error);
+      // Let the user know it failed
+      setGeneratedText('Error: Could not generate note. Please try again.');
+    }
 
     setIsGenerating(false);
   };
